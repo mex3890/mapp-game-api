@@ -13,9 +13,9 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('profiles_professionals', function (Blueprint $table) {
+        Schema::create('patients_professionals', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('profile_id')->constrained();
+            $table->foreignId('patient_id')->constrained();
             $table->foreignId('professional_id')->constrained();
             $table->timestamps();
             $table->softDeletes();
@@ -29,6 +29,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('profiles_professionals');
+        Schema::dropIfExists('patients_professionals');
     }
 };
