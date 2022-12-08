@@ -1,8 +1,9 @@
 <?php
 
+use App\Http\Controllers\Api\ProfessionalController;
+use App\Http\Controllers\AuthController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\Api\AuthController;
 
 /*
 |--------------------------------------------------------------------------
@@ -15,14 +16,22 @@ use App\Http\Controllers\Api\AuthController;
 |
 */
 
+Route::get('/', function () {
+    return new \Illuminate\Http\JsonResponse(
+        [
+            'error' => false,
+            'message' => 'Connection API Test'
+        ]
+    );
+});
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
 
-Route::post('register', [AuthController::class, 'createUser']);
-Route::post('login', [AuthController::class, 'loginUser']);
-Route::get('results', function (){
-    return 'User authenticated';
-})->middleware('auth:sanctum');
+Route::post('register', [AuthController::class, 'register']);
+Route::post('login', [AuthController::class, 'login']);
+Route::post('professional/validation', [ProfessionalController::class, 'validation'])->middleware('auth:sanctum');
+
+Route::apiResource('patients', ProfessionalController::class)->middleware('auth:sanctum');
 
 // Use middleware('auth:sanctum') para as rotas de consulta e cadastro que precisam estar logado
