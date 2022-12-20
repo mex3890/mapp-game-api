@@ -303,4 +303,39 @@ class ProfessionalController extends Controller
             ], 500);
         }
     }
+
+    public function destroyPatientRelation(Request $request): JsonResponse
+    {
+        try {
+            $patient_id = $request->get('patient_id');
+
+            $professional = Professional::where('user_id', $request->get('user_id'))->first();
+
+            Log::notice($professional);
+
+            if (!$patient_id || !$professional->id) {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Patient not found!',
+                    'error' => 'Profile not found!'
+                ], 202);
+            }
+
+            DB::table('professional_patient')
+                ->where('patient_id', $patient_id)
+                ->where('professional_id', $professional->id)
+                ->delete();
+
+            return response()->json([
+                'status' => true,
+                'message' => 'Patient deleted'
+            ]);
+        } catch (Throwable $throwable) {
+            Log::notice($throwable);
+            return response()->json([
+                'status' => false,
+                'message' => 'Internal server error!'
+            ], 500);
+        }
+    }
 }

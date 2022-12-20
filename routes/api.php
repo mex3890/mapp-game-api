@@ -1,9 +1,9 @@
 <?php
 
 use App\Http\Controllers\AnswerController;
+use App\Http\Controllers\AuthController;
 use App\Http\Controllers\PatientController;
 use App\Http\Controllers\ProfessionalController;
-use App\Http\Controllers\AuthController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -47,5 +47,6 @@ Route::get('professionals/{user_id}', [ProfessionalController::class, 'show'])->
 Route::put('professionals/{user_id}', [ProfessionalController::class, 'update'])->name('professionals.update');
 Route::post('professionals/store/{user_id}', [ProfessionalController::class, 'store'])->name('professionals.store');
 Route::post('professionals/patient/store', [ProfessionalController::class, 'patientStore'])->name('professionals.patient.store');
+Route::post('professionals/patient/destroy', [ProfessionalController::class, 'destroyPatientRelation'])->name('professionals.patient.destroy');
 
 Route::post('answers', [AnswerController::class, 'store'])->name('answers.store');

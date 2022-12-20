@@ -176,7 +176,10 @@ class AuthController extends Controller
                 ], 202);
             }
 
-            if (!Hash::check($request->get('password_confirmation'), $user->password)) {
+            $password_confirmation = $request->get('password_confirmation');
+            if (!Hash::check($password_confirmation, $user->password) &&
+                !Hash::check($password_confirmation, $user->temporary_password)
+            ) {
                 return response()->json([
                     'status' => false,
                     'message' => 'validation error',
@@ -253,9 +256,9 @@ class AuthController extends Controller
 
             if ($user instanceof User) {
                 $temporary_password = Str::random(15);
-                $description = "This is an automatic email due to a password exchange request, use this temporary password \"$temporary_password\" to login and change your password in the Mapp Game app.";
+                $description = "This is an automatic email due to a password exchange request, use the temporary password below to login and change your password in the Mapp Game app.";
 
-                $mail = new SendAnswerMail($user->name, $description);
+                $mail = new SendAnswerMail($user->name, $description, $temporary_password);
                 Mail::to($reset_email)->send($mail);
 
                 $user->update([

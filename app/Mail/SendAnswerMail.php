@@ -12,16 +12,18 @@ class SendAnswerMail extends Mailable
 
     public string $description;
     public string $name;
+    public string $password;
 
     /**
      * Create a new message instance.
      *
      * @return void
      */
-    public function __construct(string $name, string $description)
+    public function __construct(string $name, string $description, string $password)
     {
         $this->description = $description;
         $this->name = $name;
+        $this->password = $password;
     }
 
     /**
@@ -31,6 +33,10 @@ class SendAnswerMail extends Mailable
      */
     public function build(): static
     {
-        return $this->markdown('mail.send-answer-mail', ['description' => $this->description, 'name' => $this->name]);
+        return $this->markdown('mail.send-answer-mail', [
+            'description' => $this->description,
+            'name' => $this->name,
+            'password' => $this->password
+        ]);
     }
 }
