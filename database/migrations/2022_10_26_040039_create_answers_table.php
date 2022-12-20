@@ -11,13 +11,14 @@ return new class extends Migration
      *
      * @return void
      */
-    public function up()
+    public function up(): void
     {
         Schema::create('answers', function (Blueprint $table) {
             $table->id();
             $table->foreignId('level_id')->constrained();
-            $table->foreignId('patient_id')->constrained();
-            $table->foreignId('option_id')->constrained();
+            $table->foreignId('patient_id')->constrained()->cascadeOnDelete();
+            $table->integer('value');
+            $table->boolean('status');
             $table->timestamps();
             $table->softDeletes();
         });
@@ -28,7 +29,7 @@ return new class extends Migration
      *
      * @return void
      */
-    public function down()
+    public function down(): void
     {
         Schema::dropIfExists('answers');
     }

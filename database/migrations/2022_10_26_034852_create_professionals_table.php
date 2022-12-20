@@ -18,6 +18,8 @@ return new class extends Migration
             $table->foreignId('user_id')->constrained();
             $table->foreignId('company_id')->nullable()->constrained();
             $table->string('license')->unique();
+            $table->char('state', 2);
+            $table->date('validated_at')->nullable();
             $table->timestamps();
             $table->softDeletes();
         });

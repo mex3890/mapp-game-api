@@ -18,7 +18,6 @@ return new class extends Migration
             $table->string('value');
             $table->foreignId('level_id')->constrained();
             $table->timestamps();
-            $table->softDeletes();
         });
     }
 
