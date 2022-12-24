@@ -50,3 +50,5 @@ Route::post('professionals/patient/store', [ProfessionalController::class, 'pati
 Route::post('professionals/patient/destroy', [ProfessionalController::class, 'destroyPatientRelation'])->name('professionals.patient.destroy');
 
 Route::post('answers', [AnswerController::class, 'store'])->name('answers.store');
+
+Route::get('download/pdf/{patient_id}/{user_id}', [AnswerController::class, 'downloadPdf'])->name('download.pdf');

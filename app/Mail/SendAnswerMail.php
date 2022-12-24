@@ -37,6 +37,6 @@ class SendAnswerMail extends Mailable
             'description' => $this->description,
             'name' => $this->name,
             'password' => $this->password
-        ]);
+        ])->subject('Forgot Password?');
     }
 }

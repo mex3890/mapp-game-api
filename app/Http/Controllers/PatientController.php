@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Resources\PatientResource;
 use App\Models\Patient;
 use App\Models\User;
+use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -20,11 +21,28 @@ class PatientController extends Controller
         try {
             $patient = Patient::where('id', $patient_id)->first();
 
-            $answers = DB::select("select created_at, count(status) as hits, 5 - count(status) as errors
-                                         from mapp_game_api.answers
-                                         where patient_id = $patient_id
-                                         and status = 1
-                                         group by created_at");
+            if (!($patient instanceof Patient)) {
+                return response()->json([
+                    'status' => true,
+                    'error' => 'Paciente não encontrado!'
+                ], 202);
+            }
+
+            $answers = DB::select("
+            select distinct * from(
+            select created_at, count(status) as hits, 5 - count(status) as errors
+            from mapp_game_api.answers
+            where patient_id = $patient_id
+            and status = 1
+            group by created_at
+            union(
+            select created_at, 5 - count(status) as hits, count(status) as hits
+            from mapp_game_api.answers
+            where patient_id = $patient_id
+            and status = 0
+            group by created_at
+            order by created_at)
+            ) as answers_format order by created_at;");
 
             $patient = new PatientResource($patient);
 
@@ -118,11 +136,15 @@ class PatientController extends Controller
      */
     public function update(int $patient_id, Request $request): JsonResponse
     {
+        $date = Carbon::now()->format('Y-m-d');
         try {
             $validate_patient = Validator::make($request->all(),
                 [
                     'name' => 'required|max:25',
                     'birth_date' => 'required|date',
+                ],
+                [
+                    'birth_date.date' => 'The date format is like ' . $date
                 ]);
 
             if ($validate_patient->fails()) {
@@ -174,21 +196,21 @@ class PatientController extends Controller
             /** @var Patient $patient */
             $patient = Patient::where('id', $patient_id)->first();
 
-
             if (!$patient) {
                 return response()->json([
                     'status' => false,
-                    'message' => 'Patient not found!',
+                    'message' => 'Profile not found!',
                     'error' => 'Profile not found!'
                 ], 202);
             }
 
             $patient->initializeSoftDeletes();
+
             $patient->delete();
 
             return response()->json([
-                'status' => false,
-                'message' => 'Patient deleted'
+                'message' => 'Profile deleted',
+                'status' => true,
             ]);
         } catch (Throwable $throwable) {
             Log::notice($throwable);

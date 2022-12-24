@@ -102,9 +102,12 @@ class AuthController extends Controller
                         ], 203);
                     }
                 }
+            } else {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Credentials does not match with our record.',
+                ], 203);
             }
-
-            $user = User::where('email', $request->email)->first();
 
             if ($user->role === 1) {
 
@@ -135,6 +138,7 @@ class AuthController extends Controller
                 ]
             ]);
         } catch (Throwable $th) {
+            Log::warning($th);
             return response()->json([
                 'status' => false,
                 'message' => $th->getMessage()
@@ -169,6 +173,7 @@ class AuthController extends Controller
 
             if ($validateUser->fails()) {
                 Log::notice($validateUser->errors());
+
                 return response()->json([
                     'status' => false,
                     'message' => 'validation error',
@@ -258,7 +263,9 @@ class AuthController extends Controller
                 $temporary_password = Str::random(15);
                 $description = "This is an automatic email due to a password exchange request, use the temporary password below to login and change your password in the Mapp Game app.";
 
-                $mail = new SendAnswerMail($user->name, $description, $temporary_password);
+                $name = explode(' ', $user->name)[0];
+                $mail = new SendAnswerMail($name, $description, $temporary_password);
+
                 Mail::to($reset_email)->send($mail);
 
                 $user->update([
@@ -271,6 +278,7 @@ class AuthController extends Controller
                 'message' => 'If the email is registered an email will be sent! Look your Email inbox.',
             ]);
         } catch (Throwable $th) {
+            Log::warning($th);
             return response()->json([
                 'status' => false,
                 'message' => $th->getMessage()
